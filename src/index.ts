@@ -72,7 +72,7 @@ app.use(`${BASE_PATH}/reports`, isAuthenticated, reportRoutes);
 
 app.use(errorHandler);
 
-app.listen(config.PORT, async () => {
+app.listen(3000, async () => {
   console.log(`Server listening on port ${config.PORT} in ${config.NODE_ENV}`);
   await connectDatabase();
 });
