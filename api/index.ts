@@ -19,6 +19,11 @@ import projectRoutes from "../src/routes/project.route";
 import taskRoutes from "../src/routes/task.route";
 import reportRoutes from "../src/routes/report.route";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
+import { Strategy as LocalStrategy } from "passport-local";
+import {
+  loginOrCreateAccountService,
+  verifyUserService,
+} from "../src/services/auth.service";
 
 const app = express();
 const BASE_PATH = config.BASE_PATH;
@@ -59,6 +64,23 @@ passport.use(
         return done(null, profile);
       } catch (error) {
         return done(error as Error, undefined);
+      }
+    }
+  )
+);
+passport.use(
+  new LocalStrategy(
+    {
+      usernameField: "email",
+      passwordField: "password",
+      session: true,
+    },
+    async (email, password, done) => {
+      try {
+        const user = await verifyUserService({ email, password });
+        return done(null, user);
+      } catch (error: any) {
+        return done(error, false, { message: error?.message });
       }
     }
   )
