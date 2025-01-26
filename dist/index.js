@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 require("dotenv/config");
 const express_1 = __importDefault(require("express"));
+const cors_1 = __importDefault(require("cors"));
 const cookie_session_1 = __importDefault(require("cookie-session"));
 const app_config_1 = require("./config/app.config");
 const database_config_1 = __importDefault(require("./config/database.config"));
@@ -42,16 +43,17 @@ const corsOptions = {
     origin: (origin, callback) => {
         // Allow requests with no origin (like mobile apps or Postman)
         if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-            callback(null, true);
+            callback(null, true); // Allow the request
         }
         else {
-            callback(new Error("Not allowed by CORS"));
+            callback(new Error("Not allowed by CORS")); // Reject the request
         }
     },
-    methods: ["GET", "POST", "PUT", "DELETE"], // Allow methods as needed
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Allow all necessary HTTP methods
     allowedHeaders: ["Content-Type", "Authorization"], // Allow specific headers
     credentials: true, // Allow credentials (cookies, sessions, etc.)
 };
+app.use((0, cors_1.default)(corsOptions)); // Apply CORS middleware globally
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
 app.use((0, cookie_session_1.default)({

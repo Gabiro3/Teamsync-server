@@ -22,6 +22,7 @@ import reportRoutes from "./routes/report.route";
 const app = express();
 const BASE_PATH = config.BASE_PATH;
 
+
 // CORS Configuration
 const allowedOrigins = [
   'https://teamsync-frontend-chi.vercel.app', // Your frontend URL
@@ -32,15 +33,18 @@ const corsOptions = {
   origin: (origin: string | undefined, callback: Function) => {
     // Allow requests with no origin (like mobile apps or Postman)
     if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
+      callback(null, true); // Allow the request
     } else {
-      callback(new Error("Not allowed by CORS"));
+      callback(new Error("Not allowed by CORS")); // Reject the request
     }
   },
-  methods: ["GET", "POST", "PUT", "DELETE"], // Allow methods as needed
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Allow all necessary HTTP methods
   allowedHeaders: ["Content-Type", "Authorization"], // Allow specific headers
   credentials: true, // Allow credentials (cookies, sessions, etc.)
 };
+
+app.use(cors(corsOptions)); // Apply CORS middleware globally
+
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
