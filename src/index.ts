@@ -49,7 +49,7 @@ app.use(passport.session());
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests with no origin (like mobile apps or Postman)
+      console.log("Request Origin: ", origin);
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
@@ -59,6 +59,7 @@ app.use(
     credentials: true,
   })
 );
+
 
 app.get(
   `/`,
