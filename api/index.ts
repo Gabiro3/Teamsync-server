@@ -18,6 +18,7 @@ import memberRoutes from "../src/routes/member.route";
 import projectRoutes from "../src/routes/project.route";
 import taskRoutes from "../src/routes/task.route";
 import reportRoutes from "../src/routes/report.route";
+import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 
 const app = express();
 const BASE_PATH = config.BASE_PATH;
@@ -41,6 +42,36 @@ app.use(
     sameSite: "lax",
   })
 );
+
+// Add Passport Google Strategy configuration
+passport.use(
+  new GoogleStrategy(
+    {
+      clientID: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      callbackURL: `${process.env.BACKEND_URL}/api/auth/google/callback`,
+      scope: ["profile", "email"],
+    },
+    async (accessToken, refreshToken, profile, done) => {
+      try {
+        // Your user lookup/creation logic here
+        // This should match your existing Google strategy implementation
+        return done(null, profile);
+      } catch (error) {
+        return done(error as Error, undefined);
+      }
+    }
+  )
+);
+
+// Add these passport serialization methods
+passport.serializeUser((user, done) => {
+  done(null, user);
+});
+
+passport.deserializeUser((user, done) => {
+  done(null, user as Express.User);
+});
 
 app.use(passport.initialize());
 app.use(passport.session());
