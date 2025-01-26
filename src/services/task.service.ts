@@ -9,10 +9,10 @@ export const createTaskService = async (
   projectId: string,
   userId: string,
   body: {
-    title: string;
+    title?: string;
     description?: string;
-    priority: string;
-    status: string;
+    priority?: string;
+    status?: string;
     assignedTo?: string | null;
     dueDate?: string;
   }
@@ -58,10 +58,10 @@ export const updateTaskService = async (
   projectId: string,
   taskId: string,
   body: {
-    title: string;
+    title?: string;
     description?: string;
-    priority: string;
-    status: string;
+    priority?: string;
+    status?: string;
     assignedTo?: string | null;
     dueDate?: string;
   }

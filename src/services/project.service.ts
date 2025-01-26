@@ -137,7 +137,7 @@ export const updateProjectService = async (
   projectId: string,
   body: {
     emoji?: string;
-    name: string;
+    name?: string;
     description?: string;
   }
 ) => {
