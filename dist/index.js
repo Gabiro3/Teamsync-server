@@ -35,9 +35,23 @@ const app = (0, express_1.default)();
 const BASE_PATH = app_config_1.config.BASE_PATH;
 // CORS Configuration
 const allowedOrigins = [
-    'https://teamsync-frontend-chi.vercel.app',
+    'https://teamsync-frontend-chi.vercel.app', // Your frontend URL
     // Add other origins here if necessary
 ];
+const corsOptions = {
+    origin: (origin, callback) => {
+        // Allow requests with no origin (like mobile apps or Postman)
+        if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true);
+        }
+        else {
+            callback(new Error("Not allowed by CORS"));
+        }
+    },
+    methods: ["GET", "POST", "PUT", "DELETE"], // Allow methods as needed
+    allowedHeaders: ["Content-Type", "Authorization"], // Allow specific headers
+    credentials: true, // Allow credentials (cookies, sessions, etc.)
+};
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
 app.use((0, cookie_session_1.default)({
