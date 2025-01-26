@@ -71,9 +71,9 @@ app.use(`${BASE_PATH}/reports`, isAuthenticated, reportRoutes);
 
 app.use(errorHandler);
 
-// The serverless function handler for Vercel
-export default (req: Request, res: Response) => {
-  app(req, res);
-};
+app.listen(3000, async () => {
+  console.log(`Server listening on port ${config.PORT} in ${config.NODE_ENV}`);
+  await connectDatabase();
+});
 
 
