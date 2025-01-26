@@ -15,7 +15,7 @@ import ProjectModel from "../models/project.model";
 export const createWorkspaceService = async (
   userId: string,
   body: {
-    name: string;
+    name?: string;
     description?: string | undefined;
   }
 ) => {
