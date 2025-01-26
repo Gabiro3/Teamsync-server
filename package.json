@@ -12,6 +12,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "type": "module",
   "dependencies": {
     "@react-email/components": "^0.0.32",
     "bcrypt": "^5.1.1",

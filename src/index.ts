@@ -9,8 +9,6 @@ import { HTTPSTATUS } from "./config/http.config";
 import { asyncHandler } from "./middlewares/asyncHandler.middleware";
 import { BadRequestException } from "./utils/appError";
 import { ErrorCodeEnum } from "./enums/error-code.enum";
-
-import "./config/passport.config";
 import passport from "passport";
 import authRoutes from "./routes/auth.route";
 import userRoutes from "./routes/user.route";
@@ -25,7 +23,6 @@ const app = express();
 const BASE_PATH = config.BASE_PATH;
 
 app.use(express.json());
-
 app.use(express.urlencoded({ extended: true }));
 
 app.use(
@@ -72,7 +69,8 @@ app.use(`${BASE_PATH}/reports`, isAuthenticated, reportRoutes);
 
 app.use(errorHandler);
 
-app.listen(3000, async () => {
-  console.log(`Server listening on port ${config.PORT} in ${config.NODE_ENV}`);
-  await connectDatabase();
-});
+// The serverless function handler for Vercel
+export default (req: Request, res: Response) => {
+  app(req, res);
+};
+
