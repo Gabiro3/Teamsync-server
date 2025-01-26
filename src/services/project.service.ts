@@ -9,7 +9,7 @@ export const createProjectService = async (
   workspaceId: string,
   body: {
     emoji?: string;
-    name: string;
+    name?: string;
     description?: string;
   }
 ) => {
