@@ -46,19 +46,6 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Update CORS middleware to allow only specific origin
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      console.log("Request Origin: ", origin);
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error('CORS not allowed by this origin'), false);
-      }
-    },
-    credentials: true,
-  })
-);
 
 
 app.get(
