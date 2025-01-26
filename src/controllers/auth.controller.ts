@@ -26,7 +26,7 @@ export const registerUserController = asyncHandler(
   async (req: Request, res: Response) => {
     const body = registerSchema.parse({
       ...req.body,
-    });
+    }) as { email: string; name: string; password: string };
 
     await registerUserService(body);
 
