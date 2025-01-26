@@ -22,6 +22,12 @@ import reportRoutes from "./routes/report.route";
 const app = express();
 const BASE_PATH = config.BASE_PATH;
 
+// CORS Configuration
+const allowedOrigins = [
+  'https://teamsync-frontend-chi.vercel.app',
+  // Add other origins here if necessary
+];
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -39,9 +45,17 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
+// Update CORS middleware to allow only specific origin
 app.use(
   cors({
-    origin: config.FRONTEND_ORIGIN,
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps or Postman)
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('CORS not allowed by this origin'), false);
+      }
+    },
     credentials: true,
   })
 );
@@ -73,4 +87,5 @@ app.use(errorHandler);
 export default (req: Request, res: Response) => {
   app(req, res);
 };
+
 
