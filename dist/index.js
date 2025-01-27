@@ -36,22 +36,21 @@ const app = (0, express_1.default)();
 const BASE_PATH = app_config_1.config.BASE_PATH;
 // CORS Configuration
 const allowedOrigins = [
-    'https://teamsync-frontend-chi.vercel.app', // Your frontend URL
+    "https://teamsync-frontend-chi.vercel.app", // Your frontend URL
     // Add other origins here if necessary
 ];
 const corsOptions = {
     origin: (origin, callback) => {
-        // Allow requests with no origin (like mobile apps or Postman)
-        if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+        if (!origin || allowedOrigins.includes(origin)) {
             callback(null, true); // Allow the request
         }
         else {
             callback(new Error("Not allowed by CORS")); // Reject the request
         }
     },
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Allow all necessary HTTP methods
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Allow HTTP methods
     allowedHeaders: ["Content-Type", "Authorization"], // Allow specific headers
-    credentials: true, // Allow credentials (cookies, sessions, etc.)
+    credentials: true, // Allow credentials
 };
 app.use((0, cors_1.default)(corsOptions)); // Apply CORS middleware globally
 app.use(express_1.default.json());
@@ -66,7 +65,12 @@ app.use((0, cookie_session_1.default)({
 }));
 app.use(passport_1.default.initialize());
 app.use(passport_1.default.session());
-// Update CORS middleware to allow only specific origin
+// Debugging Middleware
+app.use((req, res, next) => {
+    console.log(`Request Origin: ${req.headers.origin}`);
+    next();
+});
+// Routes
 app.get(`/`, (0, asyncHandler_middleware_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     throw new appError_1.BadRequestException("This is a bad request", error_code_enum_1.ErrorCodeEnum.AUTH_INVALID_TOKEN);
     return res.status(http_config_1.HTTPSTATUS.OK).json({
@@ -80,8 +84,9 @@ app.use(`${BASE_PATH}/member`, isAuthenticated_middleware_1.default, member_rout
 app.use(`${BASE_PATH}/project`, isAuthenticated_middleware_1.default, project_route_1.default);
 app.use(`${BASE_PATH}/task`, isAuthenticated_middleware_1.default, task_route_1.default);
 app.use(`${BASE_PATH}/reports`, isAuthenticated_middleware_1.default, report_route_1.default);
+// Error Handler Middleware
 app.use(errorHandler_middleware_1.errorHandler);
-const port = process.env.PORT || 3000; // Fallback to 3000 for local development
+const port = process.env.PORT || 3000;
 app.listen(port, () => __awaiter(void 0, void 0, void 0, function* () {
     console.log(`Server listening on port ${port} in ${app_config_1.config.NODE_ENV}`);
     yield (0, database_config_1.default)();

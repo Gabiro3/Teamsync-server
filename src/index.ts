@@ -22,29 +22,26 @@ import reportRoutes from "./routes/report.route";
 const app = express();
 const BASE_PATH = config.BASE_PATH;
 
-
 // CORS Configuration
 const allowedOrigins = [
-  'https://teamsync-frontend-chi.vercel.app', // Your frontend URL
+  "https://teamsync-frontend-chi.vercel.app", // Your frontend URL
   // Add other origins here if necessary
 ];
 
 const corsOptions = {
   origin: (origin: string | undefined, callback: Function) => {
-    // Allow requests with no origin (like mobile apps or Postman)
-    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+    if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true); // Allow the request
     } else {
       callback(new Error("Not allowed by CORS")); // Reject the request
     }
   },
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Allow all necessary HTTP methods
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Allow HTTP methods
   allowedHeaders: ["Content-Type", "Authorization"], // Allow specific headers
-  credentials: true, // Allow credentials (cookies, sessions, etc.)
+  credentials: true, // Allow credentials
 };
 
 app.use(cors(corsOptions)); // Apply CORS middleware globally
-
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -63,9 +60,13 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Update CORS middleware to allow only specific origin
+// Debugging Middleware
+app.use((req, res, next) => {
+  console.log(`Request Origin: ${req.headers.origin}`);
+  next();
+});
 
-
+// Routes
 app.get(
   `/`,
   asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
@@ -87,13 +88,12 @@ app.use(`${BASE_PATH}/project`, isAuthenticated, projectRoutes);
 app.use(`${BASE_PATH}/task`, isAuthenticated, taskRoutes);
 app.use(`${BASE_PATH}/reports`, isAuthenticated, reportRoutes);
 
+// Error Handler Middleware
 app.use(errorHandler);
 
-const port = process.env.PORT || 3000; // Fallback to 3000 for local development
+const port = process.env.PORT || 3000;
 
 app.listen(port, async () => {
   console.log(`Server listening on port ${port} in ${config.NODE_ENV}`);
   await connectDatabase();
 });
-
-
