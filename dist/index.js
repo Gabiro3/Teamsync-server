@@ -34,6 +34,8 @@ const task_route_1 = __importDefault(require("./routes/task.route"));
 const report_route_1 = __importDefault(require("./routes/report.route"));
 const app = (0, express_1.default)();
 const BASE_PATH = app_config_1.config.BASE_PATH;
+app.use(passport_1.default.initialize());
+app.use(passport_1.default.session());
 // CORS Configuration
 const allowedOrigins = [
     "https://teamsync-frontend.onrender.com", // Your frontend URL
@@ -64,8 +66,6 @@ app.use((0, cookie_session_1.default)({
     httpOnly: true,
     sameSite: "lax",
 }));
-app.use(passport_1.default.initialize());
-app.use(passport_1.default.session());
 // Debugging Middleware
 app.use((req, res, next) => {
     console.log(`Request Origin: ${req.headers.origin}`);

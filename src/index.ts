@@ -21,6 +21,8 @@ import reportRoutes from "./routes/report.route";
 
 const app = express();
 const BASE_PATH = config.BASE_PATH;
+app.use(passport.initialize());
+app.use(passport.session());
 
 // CORS Configuration
 const allowedOrigins = [
@@ -57,9 +59,6 @@ app.use(
     sameSite: "lax",
   })
 );
-
-app.use(passport.initialize());
-app.use(passport.session());
 
 // Debugging Middleware
 app.use((req, res, next) => {
