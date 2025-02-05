@@ -36,8 +36,9 @@ const app = (0, express_1.default)();
 const BASE_PATH = app_config_1.config.BASE_PATH;
 // CORS Configuration
 const allowedOrigins = [
-    "https://teamsync-frontend-chi.vercel.app", // Your frontend URL
+    "https://teamsync-frontend.onrender.com", // Your frontend URL
     // Add other origins here if necessary
+    "http://localhost:5173"
 ];
 const corsOptions = {
     origin: (origin, callback) => {
