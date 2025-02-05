@@ -19,7 +19,6 @@ const cookie_session_1 = __importDefault(require("cookie-session"));
 const app_config_1 = require("./config/app.config");
 const database_config_1 = __importDefault(require("./config/database.config"));
 const errorHandler_middleware_1 = require("./middlewares/errorHandler.middleware");
-const http_config_1 = require("./config/http.config");
 const asyncHandler_middleware_1 = require("./middlewares/asyncHandler.middleware");
 const appError_1 = require("./utils/appError");
 const error_code_enum_1 = require("./enums/error-code.enum");
@@ -34,30 +33,29 @@ const task_route_1 = __importDefault(require("./routes/task.route"));
 const report_route_1 = __importDefault(require("./routes/report.route"));
 const app = (0, express_1.default)();
 const BASE_PATH = app_config_1.config.BASE_PATH;
-app.use(passport_1.default.initialize());
-app.use(passport_1.default.session());
-// CORS Configuration
+// CORS Configuration (must be before any authentication/session middleware)
 const allowedOrigins = [
-    "https://teamsync-frontend.onrender.com", // Your frontend URL
-    // Add other origins here if necessary
+    "https://teamsync-frontend.onrender.com",
     "http://localhost:5173"
 ];
 const corsOptions = {
     origin: (origin, callback) => {
         if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, true); // Allow the request
+            callback(null, true);
         }
         else {
-            callback(new Error("Not allowed by CORS")); // Reject the request
+            callback(new Error("Not allowed by CORS"));
         }
     },
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Allow HTTP methods
-    allowedHeaders: ["Content-Type", "Authorization"], // Allow specific headers
-    credentials: true, // Allow credentials
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
 };
 app.use((0, cors_1.default)(corsOptions)); // Apply CORS middleware globally
+// Express body parsing
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
+// Session Middleware (must come before passport.session)
 app.use((0, cookie_session_1.default)({
     name: "session",
     keys: [app_config_1.config.SESSION_SECRET],
@@ -66,7 +64,10 @@ app.use((0, cookie_session_1.default)({
     httpOnly: true,
     sameSite: "lax",
 }));
-// Debugging Middleware
+// Passport Initialization (passport.initialize before session)
+app.use(passport_1.default.initialize());
+app.use(passport_1.default.session()); // Should be after session middleware
+// Debugging Middleware (after session to log requests properly)
 app.use((req, res, next) => {
     console.log(`Request Origin: ${req.headers.origin}`);
     next();
@@ -74,9 +75,6 @@ app.use((req, res, next) => {
 // Routes
 app.get(`/`, (0, asyncHandler_middleware_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     throw new appError_1.BadRequestException("This is a bad request", error_code_enum_1.ErrorCodeEnum.AUTH_INVALID_TOKEN);
-    return res.status(http_config_1.HTTPSTATUS.OK).json({
-        message: "Hello Subscribe to the channel & share",
-    });
 })));
 app.use(`${BASE_PATH}/auth`, auth_route_1.default);
 app.use(`${BASE_PATH}/user`, isAuthenticated_middleware_1.default, user_route_1.default);
@@ -85,7 +83,7 @@ app.use(`${BASE_PATH}/member`, isAuthenticated_middleware_1.default, member_rout
 app.use(`${BASE_PATH}/project`, isAuthenticated_middleware_1.default, project_route_1.default);
 app.use(`${BASE_PATH}/task`, isAuthenticated_middleware_1.default, task_route_1.default);
 app.use(`${BASE_PATH}/reports`, isAuthenticated_middleware_1.default, report_route_1.default);
-// Error Handler Middleware
+// Error Handling Middleware (must be the last middleware)
 app.use(errorHandler_middleware_1.errorHandler);
 const port = process.env.PORT || 3000;
 app.listen(port, () => __awaiter(void 0, void 0, void 0, function* () {

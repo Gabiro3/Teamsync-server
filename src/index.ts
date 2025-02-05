@@ -21,34 +21,33 @@ import reportRoutes from "./routes/report.route";
 
 const app = express();
 const BASE_PATH = config.BASE_PATH;
-app.use(passport.initialize());
-app.use(passport.session());
 
-// CORS Configuration
+// CORS Configuration (must be before any authentication/session middleware)
 const allowedOrigins = [
-  "https://teamsync-frontend.onrender.com", // Your frontend URL
-  // Add other origins here if necessary
+  "https://teamsync-frontend.onrender.com",
   "http://localhost:5173"
 ];
 
 const corsOptions = {
   origin: (origin: string | undefined, callback: Function) => {
     if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true); // Allow the request
+      callback(null, true);
     } else {
-      callback(new Error("Not allowed by CORS")); // Reject the request
+      callback(new Error("Not allowed by CORS"));
     }
   },
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Allow HTTP methods
-  allowedHeaders: ["Content-Type", "Authorization"], // Allow specific headers
-  credentials: true, // Allow credentials
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
 };
 
 app.use(cors(corsOptions)); // Apply CORS middleware globally
 
+// Express body parsing
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Session Middleware (must come before passport.session)
 app.use(
   session({
     name: "session",
@@ -60,7 +59,11 @@ app.use(
   })
 );
 
-// Debugging Middleware
+// Passport Initialization (passport.initialize before session)
+app.use(passport.initialize());
+app.use(passport.session()); // Should be after session middleware
+
+// Debugging Middleware (after session to log requests properly)
 app.use((req, res, next) => {
   console.log(`Request Origin: ${req.headers.origin}`);
   next();
@@ -74,9 +77,6 @@ app.get(
       "This is a bad request",
       ErrorCodeEnum.AUTH_INVALID_TOKEN
     );
-    return res.status(HTTPSTATUS.OK).json({
-      message: "Hello Subscribe to the channel & share",
-    });
   })
 );
 
@@ -88,7 +88,7 @@ app.use(`${BASE_PATH}/project`, isAuthenticated, projectRoutes);
 app.use(`${BASE_PATH}/task`, isAuthenticated, taskRoutes);
 app.use(`${BASE_PATH}/reports`, isAuthenticated, reportRoutes);
 
-// Error Handler Middleware
+// Error Handling Middleware (must be the last middleware)
 app.use(errorHandler);
 
 const port = process.env.PORT || 3000;
@@ -97,3 +97,4 @@ app.listen(port, async () => {
   console.log(`Server listening on port ${port} in ${config.NODE_ENV}`);
   await connectDatabase();
 });
+
